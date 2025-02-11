@@ -6,9 +6,9 @@ import os
 load_dotenv(override=True)
 
 TOKEN = os.getenv("INVITER_TOKEN")
-SOURCE_GUILD_ID = int(os.getenv("SOURCE_GUILD_ID"))
-AJUDANTE_ID = int(os.getenv("AJUDANTE_ID"))
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+SOURCE_GUILD_ID = os.getenv("SOURCE_GUILD_ID")
+AJUDANTE_ID = os.getenv("AJUDANTE_ID")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
 # Bot setup with required intents
 intents = discord.Intents.default()
 intents.guilds = True
