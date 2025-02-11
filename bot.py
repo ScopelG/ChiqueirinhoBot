@@ -32,14 +32,13 @@ async def on_ready():
     except Exception as e:
         print(f"Error syncing commands: {e}")
 
-@bot.tree.command(name="create_invite", description="Create an invite from another server")
+@bot.tree.command(name="create_invite", description="Cria o Convite para o servidor principal ")
 async def create_invite(interaction: discord.Interaction):
-    # Defer the response to prevent interaction timeout
     await interaction.response.defer(ephemeral=True)
     
     source_guild = bot.get_guild(SOURCE_GUILD_ID)
     if not source_guild:
-        await interaction.followup.send("I am not in the source server.", ephemeral=True)
+        await interaction.followup.send("Servidor Chiqueirinho nao existe", ephemeral=True)
         return
 
     source_channel = bot.get_channel(CHANNEL_ID)
@@ -48,7 +47,7 @@ async def create_invite(interaction: discord.Interaction):
         return
 
     try:
-        invite = await source_channel.create_invite(max_age=86400, max_uses=1, unique=True)
+        invite = await source_channel.create_invite(max_age=86400, max_uses=1, unique=True, reason= f"O {interaction.user.name} Criou um convite")
         await interaction.followup.send(f"Aqui está o convite para o **{source_guild.name}**: {invite.url}")
     except Exception as e:
         await interaction.followup.send(f"Failed to create invite: {e}", ephemeral=True)
