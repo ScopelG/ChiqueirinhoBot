@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
+from keep_alive import keep_alive
 import os
 
 load_dotenv(override=True)
@@ -59,4 +60,5 @@ async def create_invite(interaction: discord.Interaction):
     await interaction.response.send_message(f"Aqui está o convite para o **{source_guild.name}**: {invite.url}")
 
 # Run the bot
+keep_alive()
 bot.run(TOKEN)
