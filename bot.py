@@ -34,7 +34,7 @@ async def on_ready():
 
 @bot.tree.command(name="create_invite", description="Cria o Convite para o servidor principal ")
 async def create_invite(interaction: discord.Interaction):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
     
     source_guild = bot.get_guild(SOURCE_GUILD_ID)
     if not source_guild:
