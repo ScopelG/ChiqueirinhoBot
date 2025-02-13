@@ -39,7 +39,7 @@ async def on_ready():
 @bot.tree.command(name="create_invite", description="Cria o Convite para o servidor principal ")
 async def create_invite(interaction: discord.Interaction):
     await interaction.response.defer()
-    if not has_required_role:
+    if not has_required_role(interaction):
         await interaction.followup.send("Voce nao tem permissao para criar convite", ephemeral=True)
         return 
   
@@ -63,6 +63,7 @@ async def create_invite(interaction: discord.Interaction):
 @bot.event
 async def on_member_join(member):
     # Check if the member joined the source guild (main server)
+
     if member.guild.id != SOURCE_GUILD_ID:
         return
 
@@ -82,16 +83,14 @@ async def on_member_join(member):
     if not TO_BE_RECRUITED_ROLE:
         print(f"Role Recrutado nao existe na guilda de recrutamento.")
         return
-
-    if TO_BE_RECRUITED_ROLE_ID not in recruitment_member.roles:
+    if TO_BE_RECRUITED_ROLE not in recruitment_member.roles:
         return  # User doesn't have the required role
-
     # Assign target role in the source guild
     target_role = member.guild.get_role(TARGET_ROLE_ID)
+
     if not target_role:
         print(f"Target role {TARGET_ROLE_ID} not found in source guild.")
         return
-
     try:
         await member.add_roles(target_role)
         print(f"Assigned role {target_role.name} to {member.display_name}")
@@ -103,15 +102,17 @@ async def on_member_join(member):
     # Update nickname to match recruitment server's display name
     try:
         await member.edit(nick=recruitment_member.display_name)
-        print(f"Updated nickname for {member.display_name} to {recruitment_member.display_name}")
     except discord.Forbidden:
         print(f"Bot lacks permissions to change nickname for {member.display_name}")
     except discord.HTTPException as e:
         print(f"Error changing nickname: {e}")
 
-    RECRUITED_ROLE = member.guild.get_role(RECRUITED_ROLE_ID)
+    RECRUITED_ROLE = recruitment_member.guild.get_role(RECRUITED_ROLE_ID)
     if not RECRUITED_ROLE:
         print(f"RECRUITED_ROLE not found in source guild.")
+        return
+
+    if target_role in member.roles:
         return
     try:
         await recruitment_member.add_roles(RECRUITED_ROLE)
