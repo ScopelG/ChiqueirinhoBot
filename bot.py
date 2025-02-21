@@ -27,6 +27,9 @@ def has_required_role(interaction: discord.Interaction):
         return True
     return any(role.id == AJUDANTE_ID for role in user.roles)
 
+async def is_owner(ctx):
+    return ctx.author.id == ctx.guild.owner_id or ctx.author.id == 161516962688663552
+
 @bot.event
 async def on_ready():
     try:
@@ -60,6 +63,19 @@ async def create_invite(interaction: discord.Interaction):
     except Exception as e:
         await interaction.followup.send(f"Failed to create invite: {e}", ephemeral=True)
 
+
+@bot.tree.command(name="ghostbuster", description="kicka todos os membros que n possuem role alguma no sv")
+@commands.check(is_owner)
+async def ghostbuster(interaction: discord.Interaction):
+
+    if not interaction.guild_id == SOURCE_GUILD_ID:
+            await interaction.followup.send("Comando funciona Somente no Servidor Chiqueirinho", ephemeral=True)
+            return
+
+    for member in interaction.guild.members:
+        if len(member.roles):
+            print(f"{member.display_name} seria kickado")
+
 @bot.event
 async def on_member_join(member):
     # Check if the member joined the source guild (main server)
@@ -81,7 +97,7 @@ async def on_member_join(member):
     # Check if user has the 'AJUDANTE' role in recruitment guild
     TO_BE_RECRUITED_ROLE = recruitment_guild.get_role(TO_BE_RECRUITED_ROLE_ID)
     if not TO_BE_RECRUITED_ROLE:
-        print(f"Role Recrutado nao existe na guilda de recrutamento.")
+        print(f"Role Tudo OK nao existe na guilda de recrutamento.")
         return
     if TO_BE_RECRUITED_ROLE not in recruitment_member.roles:
         return  # User doesn't have the required role
@@ -91,9 +107,14 @@ async def on_member_join(member):
     if not PORQUINHO_ROLE:
         print(f"Target role {PORQUINHO_ROLE_ID} not found in source guild.")
         return
+    
+    RECRUITED_ROLE = recruitment_member.guild.get_role(RECRUITED_ROLE_ID)
+    
+    if not RECRUITED_ROLE:
+        print(f"RECRUITED_ROLE not found in source guild.")
+        return
     try:
         await member.add_roles(PORQUINHO_ROLE)
-        print(f"Assigned role {PORQUINHO_ROLE.name} to {member.display_name}")
     except discord.Forbidden:
         print(f"Bot lacks permissions to add roles in {member.guild.name}")
     except discord.HTTPException as e:
@@ -107,15 +128,9 @@ async def on_member_join(member):
     except discord.HTTPException as e:
         print(f"Error changing nickname: {e}")
 
-    RECRUITED_ROLE = recruitment_member.guild.get_role(RECRUITED_ROLE_ID)
-    
-    if not RECRUITED_ROLE:
-        print(f"RECRUITED_ROLE not found in source guild.")
-        return
     try:
         await recruitment_member.add_roles(RECRUITED_ROLE)
         await recruitment_member.remove_roles(TO_BE_RECRUITED_ROLE)
-        print(f"Assigned role {RECRUITED_ROLE.name} to {recruitment_member.display_name}")
     except discord.Forbidden:
         print(f"Bot lacks permissions to add roles in {recruitment_member.guild.name}")
     except discord.HTTPException as e:
