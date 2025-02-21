@@ -12,7 +12,7 @@ TO_BE_RECRUITED_ROLE_ID = int(os.getenv("TO_BE_RECRUITED_ROLE_ID"))
 RECRUITED_ROLE_ID = int(os.getenv("RECRUITED_ROLE_ID"))
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))         
 RECRUITMENT_GUILD_ID = int(os.getenv("RECRUITMENT_GUILD_ID"))  
-TARGET_ROLE_ID = int(os.getenv("TARGET_ROLE_ID"))              
+PORQUINHO_ROLE_ID = int(os.getenv("PORQUINHO_ROLE_ID"))              
 
 intents = discord.Intents.default()
 intents.guilds = True
@@ -66,7 +66,7 @@ async def on_member_join(member):
 
     if member.guild.id != SOURCE_GUILD_ID:
         return
-
+    
     # Get the recruitment guild
     recruitment_guild = bot.get_guild(RECRUITMENT_GUILD_ID)
     if not recruitment_guild:
@@ -86,14 +86,14 @@ async def on_member_join(member):
     if TO_BE_RECRUITED_ROLE not in recruitment_member.roles:
         return  # User doesn't have the required role
     # Assign target role in the source guild
-    target_role = member.guild.get_role(TARGET_ROLE_ID)
+    PORQUINHO_ROLE = member.guild.get_role(PORQUINHO_ROLE_ID)
 
-    if not target_role:
-        print(f"Target role {TARGET_ROLE_ID} not found in source guild.")
+    if not PORQUINHO_ROLE:
+        print(f"Target role {PORQUINHO_ROLE_ID} not found in source guild.")
         return
     try:
-        await member.add_roles(target_role)
-        print(f"Assigned role {target_role.name} to {member.display_name}")
+        await member.add_roles(PORQUINHO_ROLE)
+        print(f"Assigned role {PORQUINHO_ROLE.name} to {member.display_name}")
     except discord.Forbidden:
         print(f"Bot lacks permissions to add roles in {member.guild.name}")
     except discord.HTTPException as e:
@@ -108,11 +108,9 @@ async def on_member_join(member):
         print(f"Error changing nickname: {e}")
 
     RECRUITED_ROLE = recruitment_member.guild.get_role(RECRUITED_ROLE_ID)
+    
     if not RECRUITED_ROLE:
         print(f"RECRUITED_ROLE not found in source guild.")
-        return
-
-    if target_role in member.roles:
         return
     try:
         await recruitment_member.add_roles(RECRUITED_ROLE)
